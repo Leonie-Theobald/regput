@@ -19,7 +19,9 @@ local function show_registers()
 		end
 	end
 
-	-- Define window position and size
+	-- Define window size and position
+	local width = 55
+	local height = 20
 	local row = 5
 	local col = (function() -- col placements depends on whether neo-tree is shown or not
 		local neo_win = nil
@@ -39,8 +41,6 @@ local function show_registers()
 
 		return neo_tree_width
 	end)()
-	local width = 55
-	local height = 20
 
 	-- Create buffer for preview
 	local buf_preview = vim.api.nvim_create_buf(false, true)
