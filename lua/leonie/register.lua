@@ -1,27 +1,5 @@
 print("Setup register.lua")
 
--- calculate position to be directly right of (closed) neo-tree
-local function get_neo_tree_plus_separation_width()
-  local neo_win = nil
-  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-    local buf = vim.api.nvim_win_get_buf(win)
-    if vim.bo[buf].filetype == "neo-tree" then
-      neo_win = win
-      break
-    end
-  end
-  
-  -- default is 0
-  if neo_win then
-   neo_tree_width = vim.api.nvim_win_get_width(neo_win) + 7
-  else 
-    neo_tree_width = 6
-  end
-
-  return neo_tree_width
-end
-
-
 -- actual register window
 local function show_registers()
   -- save information on current buffer for later
@@ -43,7 +21,24 @@ local function show_registers()
 
   -- Define window position and size
   local row = 5
-  local col = get_neo_tree_plus_separation_width()
+  local col = (function() -- col placements depends on whether neo-tree is shown or not
+    local neo_win = nil
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+      local buf = vim.api.nvim_win_get_buf(win)
+      if vim.bo[buf].filetype == "neo-tree" then
+        neo_win = win
+        break
+      end
+    end
+    
+    if neo_win then
+     neo_tree_width = vim.api.nvim_win_get_width(neo_win) + 7
+    else 
+      neo_tree_width = 6
+    end
+
+    return neo_tree_width
+  end)()
   local width = 55
   local height = 20
 
