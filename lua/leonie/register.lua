@@ -1,5 +1,16 @@
 print("Setup register.lua")
 
+local function get_register_content_at_cursor_position(cursor_position, register_lines)
+	local relevant_register = register_lines[cursor_position[1]]
+	print(relevant_register)
+	local relevant_register_name = string.sub(
+		relevant_register, 
+		7,	-- extract register name character
+		8
+	)
+	return vim.fn.getreg(relevant_register_name, 1, true)	
+end
+
 local function close_register_view(win_preview, win_detail, win_original, cursor_original)
 	-- close floating windows
 	vim.api.nvim_win_close(win_preview, true)
@@ -109,17 +120,8 @@ local function show_registers()
 				cursor_position[1] = 3
 			end
 
-			-- clear detailed window and paste the content of the currently selected
-			-- register in the preview window
 			vim.api.nvim_buf_set_lines(buf_detail, 0, -1, true, {}) -- clears detail buf
-			local relevant_register = lines[cursor_position[1]]
-			local relevant_register_name = string.sub(
-				relevant_register, 
-				7,	-- extract register name character
-				8
-			)
-			local relevant_register_content = vim.fn.getreg(relevant_register_name, 1, true)	
-			-- paste register content into detailed window
+			local relevant_register_content = get_register_content_at_cursor_position(cursor_position, lines)
 			put_content_to_window(relevant_register_content, win_detail, {1, 1}, "P")
 
 			-- make preview window active again
