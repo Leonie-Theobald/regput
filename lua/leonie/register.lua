@@ -24,6 +24,10 @@ end
 
 -- actual register window
 local function show_registers()
+  -- save information on current buffer for later
+  local original_win = vim.api.nvim_get_current_win()
+  local original_cursor = vim.api.nvim_win_get_cursor(original_win)
+
   -- Get registers output
   local reg_output = vim.fn.execute("registers")
   local lines = vim.split(reg_output, "\n")
@@ -96,8 +100,13 @@ end
 
   -- Close mappings
   vim.keymap.set("n", "q", function()
+    -- close floating windows
     vim.api.nvim_win_close(win, true)
     vim.api.nvim_win_close(win_preview, true)
+
+    -- go back to original window and cursor position
+    vim.api.nvim_set_current_win(original_win)
+    vim.api.nvim_win_set_cursor(original_win, original_cursor)
   end, { buffer = buf, nowait = true })
 end
 
