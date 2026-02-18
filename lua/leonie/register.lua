@@ -1,6 +1,7 @@
 print("Setup register.lua")
 
-local function get_register_content_at_cursor_position(cursor_position, register_lines)
+local function get_register_content_at_cursor_position(win_preview, register_lines)
+	local cursor_position = vim.api.nvim_win_get_cursor(win_preview)
 	local relevant_register = register_lines[cursor_position[1]]
 	print(relevant_register)
 	local relevant_register_name = string.sub(
@@ -121,7 +122,7 @@ local function show_registers()
 			end
 
 			vim.api.nvim_buf_set_lines(buf_detail, 0, -1, true, {}) -- clears detail buf
-			local relevant_register_content = get_register_content_at_cursor_position(cursor_position, lines)
+			local relevant_register_content = get_register_content_at_cursor_position(win_preview, lines)
 			put_content_to_window(relevant_register_content, win_detail, {1, 1}, "P")
 
 			-- make preview window active again
@@ -129,6 +130,19 @@ local function show_registers()
 
 		end,
 	})
+
+	-- Paste mappings
+	vim.keymap.set("n", "p", function()
+		local relevant_register_content = get_register_content_at_cursor_position(win_preview, lines)
+		close_register_view(win_preview, win_detail, win_original, cursor_original)
+		put_content_to_window(relevant_register_content, win_original, cursor_original, "p")
+	end, { buffer = buf, nowait = true })
+
+	vim.keymap.set("n", "P", function()
+		local relevant_register_content = get_register_content_at_cursor_position(win_preview, lines)
+		close_register_view(win_preview, win_detail, win_original, cursor_original)
+		put_content_to_window(relevant_register_content, win_original, cursor_original, "P")
+	end, { buffer = buf, nowait = true })
 
 	-- Close mappings
 	vim.keymap.set("n", "q", function()
