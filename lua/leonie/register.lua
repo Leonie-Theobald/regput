@@ -1,5 +1,17 @@
 print("Setup register.lua")
 
+local function put_content_to_window(content, window, cursor_position, p_or_P)
+	vim.api.nvim_set_current_win(window)
+	vim.api.nvim_win_set_cursor(window, cursor_position)
+	if p_or_P == "p" then
+		vim.api.nvim_put(content, "l", true, true)
+	elseif p_or_P == "P" then
+		vim.api.nvim_put(content, "l", false, true)
+	else 
+		error("Select p or P")
+	end
+end
+
 -- actual register window
 local function show_registers()
 	-- save information on current buffer for later
@@ -84,8 +96,25 @@ local function show_registers()
 			local cursor_position = vim.api.nvim_win_get_cursor(win_preview)
 			-- force cursor to stay in area with register lines
 			if cursor_position[1] < 3 then
-				vim.api.nvim_win_set_cursor(win_preview, {3, 0})
+				cursor_position[1] = 3
 			end
+
+			-- clear detailed window and paste the content of the currently selected
+			-- register in the preview window
+			vim.api.nvim_buf_set_lines(buf_detail, 0, -1, true, {}) -- clears detail buf
+			local relevant_register = lines[cursor_position[1]]
+			local relevant_register_name = string.sub(
+				relevant_register, 
+				7,	-- extract register name character
+				8
+			)
+			local relevant_register_content = vim.fn.getreg(relevant_register_name, 1, true)	
+			-- paste register content into detailed window
+			put_content_to_window(relevant_register_content, win_detail, {1, 1}, "P")
+
+			-- make preview window active again
+			vim.api.nvim_set_current_win(win_preview)
+
 		end,
 	})
 
