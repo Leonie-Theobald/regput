@@ -19,7 +19,7 @@ local function show_registers()
 		end
 	end
 
-	-- Define window size and position
+	-- Define preview window size and position
 	local width = 55
 	local height = 20
 	local row = 5
@@ -44,6 +44,7 @@ local function show_registers()
 
 	-- Create buffer for preview
 	local buf_preview = vim.api.nvim_create_buf(false, true)
+	vim.api.nvim_buf_set_lines(buf_preview, 0, -1, false, lines)
 	vim.bo[buf_preview].bufhidden = "wipe"
 	vim.bo[buf_preview].filetype = "vim"
 
@@ -53,40 +54,37 @@ local function show_registers()
 		width = width,
 		height = height,
 		row = row,
-		col = col + width + 1,
-		style = "minimal",
-		border = "rounded",
-	})
-
-	-- Create buffer for lines
-	local buf = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-	vim.bo[buf].bufhidden = "wipe"
-	vim.bo[buf].filetype = "vim"
-
-	-- Open floating window
-	local win = vim.api.nvim_open_win(buf, true, {
-		relative = "editor",
-		width = width,
-		height = height,
-		row = row,
 		col = col,
 		style = "minimal",
 		border = "rounded",
 	})
 
-	-- modify cursor
-	vim.wo[win].cursorline = true	-- highlight active line
-	vim.api.nvim_win_set_cursor(win, { 3, 0 }) -- set cursor on first real reg line
+	-- Create buffer for detailed view
+	local buf_detail = vim.api.nvim_create_buf(false, true)
+	vim.bo[buf_detail].bufhidden = "wipe"
+	vim.bo[buf_detail].filetype = "vim"
 
-	-- callback if cursor moves in this window
+	-- Open floating window for detailed view
+	local win_detail = vim.api.nvim_open_win(buf_detail, false, {
+		relative = "editor",
+		width = width,
+		height = height,
+		row = row,
+		col = col + width + 1, -- placed right of preview window
+		style = "minimal",
+		border = "rounded",
+	})
+
+	-- modify cursor
+	vim.wo[win_preview].cursorline = true	-- highlight active line
+	vim.api.nvim_win_set_cursor(win_preview, { 3, 0 }) -- set cursor on first real reg line
 	vim.api.nvim_create_autocmd("CursorMoved", {
-		buffer = buf,
+		buffer = buf_preview,
 		callback = function()
-			local cursor_position = vim.api.nvim_win_get_cursor(win)
+			local cursor_position = vim.api.nvim_win_get_cursor(win_preview)
 			-- force cursor to stay in area with register lines
 			if cursor_position[1] < 3 then
-				vim.api.nvim_win_set_cursor(win, {3, 0})
+				vim.api.nvim_win_set_cursor(win_preview, {3, 0})
 			end
 		end,
 	})
@@ -94,8 +92,8 @@ local function show_registers()
 	-- Close mappings
 	vim.keymap.set("n", "q", function()
 		-- close floating windows
-		vim.api.nvim_win_close(win, true)
 		vim.api.nvim_win_close(win_preview, true)
+		vim.api.nvim_win_close(win_detail, true)
 
 		-- go back to original window and cursor position
 		vim.api.nvim_set_current_win(original_win)
