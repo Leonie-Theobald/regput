@@ -79,18 +79,16 @@ local function show_registers()
   vim.wo[win].cursorline = true	-- highlight active line
   vim.api.nvim_win_set_cursor(win, { 3, 0 }) -- set cursor on first real reg line
 
--- callback for cursor moved
-local function on_cursor_moved()
-  -- force cursor to stay in area with register lines
-  local cursor_position = vim.api.nvim_win_get_cursor(win)
-  if cursor_position[1] < 3 then
-    vim.api.nvim_win_set_cursor(win, {3, 0})
-  end
-end
   -- callback if cursor moves in this window
   vim.api.nvim_create_autocmd("CursorMoved", {
     buffer = buf,
-    callback = on_cursor_moved,
+    callback = function()
+      local cursor_position = vim.api.nvim_win_get_cursor(win)
+      -- force cursor to stay in area with register lines
+      if cursor_position[1] < 3 then
+        vim.api.nvim_win_set_cursor(win, {3, 0})
+      end
+    end,
   })
 
   -- Close mappings
