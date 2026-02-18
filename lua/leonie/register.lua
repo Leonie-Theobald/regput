@@ -21,14 +21,6 @@ local function get_neo_tree_plus_separation_width()
   return neo_tree_width
 end
 
--- callback for cursor moved
-local function on_cursor_moved()
-  -- force cursor to stay in area with register lines
-  local cursor_position = vim.api.nvim_win_get_cursor(win)
-  if cursor_position[1] < 3 then
-    vim.api.nvim_win_set_cursor(win, {3, 0})
-  end
-end
 
 -- actual register window
 local function show_registers()
@@ -45,17 +37,33 @@ local function show_registers()
     end
   end
 
+  -- Define window position and size
+  local row = 5
+  local col = get_neo_tree_plus_separation_width()
+  local width = 55
+  local height = 20
+
+  -- Create buffer for preview
+  local buf_preview = vim.api.nvim_create_buf(false, true)
+  vim.bo[buf_preview].bufhidden = "wipe"
+  vim.bo[buf_preview].filetype = "vim"
+
+  -- Open floating window for preview
+  local win_preview = vim.api.nvim_open_win(buf_preview, true, {
+    relative = "editor",
+    width = width,
+    height = height,
+    row = row,
+    col = col + width + 1,
+    style = "minimal",
+    border = "rounded",
+  })
+
   -- Create buffer for lines
   local buf = vim.api.nvim_create_buf(false, true)
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
   vim.bo[buf].bufhidden = "wipe"
   vim.bo[buf].filetype = "vim"
-
-  -- Define window position and size
-  local row = 5
-  local col = get_neo_tree_plus_separation_width()
-  local width = 60
-  local height = 20
 
   -- Open floating window
   local win = vim.api.nvim_open_win(buf, true, {
@@ -72,6 +80,14 @@ local function show_registers()
   vim.wo[win].cursorline = true	-- highlight active line
   vim.api.nvim_win_set_cursor(win, { 3, 0 }) -- set cursor on first real reg line
 
+-- callback for cursor moved
+local function on_cursor_moved()
+  -- force cursor to stay in area with register lines
+  local cursor_position = vim.api.nvim_win_get_cursor(win)
+  if cursor_position[1] < 3 then
+    vim.api.nvim_win_set_cursor(win, {3, 0})
+  end
+end
   -- callback if cursor moves in this window
   vim.api.nvim_create_autocmd("CursorMoved", {
     buffer = buf,
@@ -81,6 +97,7 @@ local function show_registers()
   -- Close mappings
   vim.keymap.set("n", "q", function()
     vim.api.nvim_win_close(win, true)
+    vim.api.nvim_win_close(win_preview, true)
   end, { buffer = buf, nowait = true })
 end
 
