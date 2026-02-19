@@ -1,5 +1,24 @@
 print("Setup register.lua")
 
+local function get_neo_tree_width()  -- col placements depends on whether neo-tree is shown or not
+	local neo_win = nil
+	for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+		local buf = vim.api.nvim_win_get_buf(win)
+		if vim.bo[buf].filetype == "neo-tree" then
+			neo_win = win
+			break
+		end
+	end
+
+	if neo_win then
+		neo_tree_width = vim.api.nvim_win_get_width(neo_win) + 7
+	else 
+		neo_tree_width = 6
+	end
+
+	return neo_tree_width
+end
+
 local function get_register_content_at_cursor_position(win_preview, register_lines)
 	local cursor_position = vim.api.nvim_win_get_cursor(win_preview)
 	local relevant_register = register_lines[cursor_position[1]]
@@ -57,24 +76,7 @@ local function show_registers()
 	local preview_width = 55
 	local preview_height = 20
 	local preview_row = 5
-	local preview_col = (function() -- col placements depends on whether neo-tree is shown or not
-		local neo_win = nil
-		for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-			local buf = vim.api.nvim_win_get_buf(win)
-			if vim.bo[buf].filetype == "neo-tree" then
-				neo_win = win
-				break
-			end
-		end
-
-		if neo_win then
-			neo_tree_width = vim.api.nvim_win_get_width(neo_win) + 7
-		else 
-			neo_tree_width = 6
-		end
-
-		return neo_tree_width
-	end)()
+	local preview_col = get_neo_tree_width()
 
 	-- Create buffer for preview
 	local buf_preview = vim.api.nvim_create_buf(false, true)
