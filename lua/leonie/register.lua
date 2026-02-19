@@ -54,10 +54,10 @@ local function show_registers()
 	end
 
 	-- Define preview window size and position
-	local width = 55
-	local height = 20
-	local row = 5
-	local col = (function() -- col placements depends on whether neo-tree is shown or not
+	local preview_width = 55
+	local preview_height = 20
+	local preview_row = 5
+	local preview_col = (function() -- col placements depends on whether neo-tree is shown or not
 		local neo_win = nil
 		for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
 			local buf = vim.api.nvim_win_get_buf(win)
@@ -85,10 +85,10 @@ local function show_registers()
 	-- Open floating window for preview
 	local win_preview = vim.api.nvim_open_win(buf_preview, true, {
 		relative = "editor",
-		width = width,
-		height = height,
-		row = row,
-		col = col,
+		width = preview_width,
+		height = preview_height,
+		row = preview_row,
+		col = preview_col,
 		style = "minimal",
 		border = "rounded",
 	})
@@ -101,10 +101,10 @@ local function show_registers()
 	-- Open floating window for detailed view
 	local win_detail = vim.api.nvim_open_win(buf_detail, false, {
 		relative = "editor",
-		width = width,
-		height = height,
-		row = row,
-		col = col + width + 1, -- placed right of preview window
+		width = preview_width,
+		height = preview_height,
+		row = preview_row,
+		col = preview_col + preview_width + 1, -- placed right of preview window
 		style = "minimal",
 		border = "rounded",
 	})
