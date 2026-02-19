@@ -136,13 +136,13 @@ local function show_registers()
 		local relevant_register_content = get_register_content_at_cursor_position(win_preview, lines)
 		close_register_view(win_preview, win_detail, win_original, cursor_original)
 		put_content_to_window(relevant_register_content, win_original, cursor_original, "p")
-	end, { buffer = buf, nowait = true })
+	end, { buffer = buf_preview, nowait = true })
 
 	vim.keymap.set("n", "P", function()
 		local relevant_register_content = get_register_content_at_cursor_position(win_preview, lines)
 		close_register_view(win_preview, win_detail, win_original, cursor_original)
 		put_content_to_window(relevant_register_content, win_original, cursor_original, "P")
-	end, { buffer = buf, nowait = true })
+	end, { buffer = buf_preview, nowait = true })
 
 	-- Close mappings
 	vim.keymap.set("n", "q", function()
