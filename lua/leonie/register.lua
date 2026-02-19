@@ -121,6 +121,7 @@ local function show_registers()
 			-- force cursor to stay in area with register lines
 			if cursor_position[1] < 3 then
 				cursor_position[1] = 3
+				vim.api.nvim_win_set_cursor(win_preview, cursor_position)
 			end
 
 			vim.api.nvim_buf_set_lines(buf_detail, 0, -1, true, {}) -- clears detail buf
