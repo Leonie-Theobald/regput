@@ -22,7 +22,6 @@ end
 local function get_register_content_at_cursor_position(win_preview, register_lines)
 	local cursor_position = vim.api.nvim_win_get_cursor(win_preview)
 	local relevant_register = register_lines[cursor_position[1]]
-	print(relevant_register)
 	local relevant_register_name = string.sub(
 		relevant_register, 
 		7,	-- extract register name character
