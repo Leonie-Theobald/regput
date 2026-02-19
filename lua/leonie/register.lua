@@ -101,7 +101,7 @@ local function show_registers()
 	-- Open floating window for detailed view
 	local win_detail = vim.api.nvim_open_win(buf_detail, false, {
 		relative = "editor",
-		width = preview_width,
+		width = vim.api.nvim_win_get_width(win_original) - preview_width - 10,
 		height = preview_height,
 		row = preview_row,
 		col = preview_col + preview_width + 1, -- placed right of preview window
