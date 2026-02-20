@@ -1,5 +1,7 @@
 local key_bindings = {}
 
+local register = require ("regput.register")
+
 function key_bindings.add(win_preview, win_detail, win_original, buf_preview, lines, cursor_original)
 	-- Paste mappings
 	vim.keymap.set("n", "p", function()

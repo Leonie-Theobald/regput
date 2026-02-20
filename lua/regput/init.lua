@@ -1,6 +1,8 @@
 local regput_modul = {}
 
 local key_bindings = require ("regput.key_bindings")
+local window = require ("regput.window")
+local register = require ("regput.register")
 
 local function get_neo_tree_width()  -- col placements depends on whether neo-tree is shown or not
 	local neo_win = nil
@@ -21,57 +23,13 @@ local function get_neo_tree_width()  -- col placements depends on whether neo-tr
 	return neo_tree_width
 end
 
-local function get_register_content_at_cursor_position(win_preview, register_lines)
-	local cursor_position = vim.api.nvim_win_get_cursor(win_preview)
-	local relevant_register = register_lines[cursor_position[1]]
-	local relevant_register_name = string.sub(
-		relevant_register, 
-		7,	-- extract register name character
-		8
-	)
-	return vim.fn.getreg(relevant_register_name, 1, true)	
-end
-
-local function close_register_view(win_preview, win_detail, win_original, cursor_original)
-	-- close floating windows
-	vim.api.nvim_win_close(win_preview, true)
-	vim.api.nvim_win_close(win_detail, true)
-
-	-- go back to original window and cursor position
-	vim.api.nvim_set_current_win(win_original)
-	vim.api.nvim_win_set_cursor(win_original, cursor_original)
-end
-
-local function put_content_to_window(content, window, cursor_position, p_or_P)
-	vim.api.nvim_set_current_win(window)
-	vim.api.nvim_win_set_cursor(window, cursor_position)
-	if p_or_P == "p" then
-		vim.api.nvim_put(content, "l", true, true)
-	elseif p_or_P == "P" then
-		vim.api.nvim_put(content, "l", false, true)
-	else 
-		error("Select p or P")
-	end
-end
-
 -- actual register window
 function regput_modul.start()
 	-- save information on current buffer for later
 	local win_original = vim.api.nvim_get_current_win()
 	local cursor_original = vim.api.nvim_win_get_cursor(win_original)
 
-	-- Get registers output
-	local reg_output = vim.fn.execute("registers")
-	local lines = vim.split(reg_output, "\n")
-
-	for i, line in ipairs(lines) do
-		local new_line = string.sub(line, 1, 50)
-		if vim.fn.strchars(line) > 50 then
-			lines[i] = new_line .. "..."
-		else 
-			lines[i] = new_line
-		end
-	end
+	local register_lines = register.get_current_content()
 
 	-- Define preview window size and position
 	local preview_width = 55
@@ -81,7 +39,7 @@ function regput_modul.start()
 
 	-- Create buffer for preview
 	local buf_preview = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_buf_set_lines(buf_preview, 0, -1, false, lines)
+	vim.api.nvim_buf_set_lines(buf_preview, 0, -1, false, register_lines)
 	vim.bo[buf_preview].bufhidden = "wipe"
 	vim.bo[buf_preview].filetype = "vim"
 
@@ -127,8 +85,8 @@ function regput_modul.start()
 			end
 
 			vim.api.nvim_buf_set_lines(buf_detail, 0, -1, true, {}) -- clears detail buf
-			local relevant_register_content = get_register_content_at_cursor_position(win_preview, lines)
-			put_content_to_window(relevant_register_content, win_detail, {1, 1}, "P")
+			local relevant_register_content = register.get_register_content_at_cursor_position(win_preview, register_lines)
+			window.put_content_to_window(relevant_register_content, win_detail, {1, 1}, "P")
 
 			-- make preview window active again
 			vim.api.nvim_set_current_win(win_preview)
@@ -136,7 +94,7 @@ function regput_modul.start()
 		end,
 	})
 
-	key_bindings.add(win_preview, win_detail, win_original, buf_preview, lines, cursor_original)
+	key_bindings.add(win_preview, win_detail, win_original, buf_preview, register_lines, cursor_original)
 end
 
 function regput_modul.setup(opts)
