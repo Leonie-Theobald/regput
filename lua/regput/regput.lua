@@ -156,6 +156,9 @@ end
 
 function regput_modul.setup(opts)
 	vim.api.nvim_create_user_command("StartRegput", regput_modul.start, {})
+	vim.api.nvim_create_user_command("TestRegput", function()
+		print("Regput executed")
+	end, {})
 	-- Key mapping for register function
 	vim.keymap.set(
 		"n",
