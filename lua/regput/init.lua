@@ -1,5 +1,7 @@
 local regput_modul = {}
 
+local key_bindings = require ("regput.key_bindings")
+
 local function get_neo_tree_width()  -- col placements depends on whether neo-tree is shown or not
 	local neo_win = nil
 	for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
@@ -134,24 +136,7 @@ function regput_modul.start()
 		end,
 	})
 
-	-- Paste mappings
-	vim.keymap.set("n", "p", function()
-		local relevant_register_content = get_register_content_at_cursor_position(win_preview, lines)
-		close_register_view(win_preview, win_detail, win_original, cursor_original)
-		put_content_to_window(relevant_register_content, win_original, cursor_original, "p")
-	end, { buffer = buf_preview, nowait = true })
-
-	vim.keymap.set("n", "P", function()
-		local relevant_register_content = get_register_content_at_cursor_position(win_preview, lines)
-		close_register_view(win_preview, win_detail, win_original, cursor_original)
-		put_content_to_window(relevant_register_content, win_original, cursor_original, "P")
-	end, { buffer = buf_preview, nowait = true })
-
-	-- Close mappings
-	vim.keymap.set("n", "q", function()
-		close_register_view(win_preview, win_detail, win_original, cursor_original)
-	end, { buffer = buf, nowait = true })
-
+	key_bindings.add(win_preview, win_detail, win_original, buf_preview, lines, cursor_original)
 end
 
 function regput_modul.setup(opts)
