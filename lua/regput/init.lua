@@ -4,25 +4,6 @@ local key_bindings = require ("regput.key_bindings")
 local window = require ("regput.window")
 local register = require ("regput.register")
 
-local function get_neo_tree_width()  -- col placements depends on whether neo-tree is shown or not
-	local neo_win = nil
-	for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-		local buf = vim.api.nvim_win_get_buf(win)
-		if vim.bo[buf].filetype == "neo-tree" then
-			neo_win = win
-			break
-		end
-	end
-
-	if neo_win then
-		neo_tree_width = vim.api.nvim_win_get_width(neo_win) + 7
-	else 
-		neo_tree_width = 6
-	end
-
-	return neo_tree_width
-end
-
 -- actual register window
 function regput_modul.start()
 	-- save information on current buffer for later
@@ -35,7 +16,7 @@ function regput_modul.start()
 	local preview_width = 55
 	local preview_height = 20
 	local preview_row = 5
-	local preview_col = get_neo_tree_width()
+	local preview_col = window.get_neo_tree_width()
 
 	-- Create buffer for preview
 	local buf_preview = vim.api.nvim_create_buf(false, true)
@@ -49,7 +30,7 @@ function regput_modul.start()
 		width = preview_width,
 		height = preview_height,
 		row = preview_row,
-		col = preview_col,
+		col = preview_col + 6,
 		style = "minimal",
 		border = "rounded",
 	})
@@ -62,11 +43,11 @@ function regput_modul.start()
 	-- Open floating window for detailed view
 	local win_detail = vim.api.nvim_open_win(buf_detail, false, {
 		relative = "editor",
-		-- take remaining space of the whole nvim view left by neo-tree and the preview win
-		width = vim.o.columns - get_neo_tree_width() - preview_width - 4,
+		-- take remaining space of whole nvim view left by neo-tree, preview win, and margin
+		width = vim.o.columns - window.get_neo_tree_width() - preview_width - 10,
 		height = preview_height,
 		row = preview_row,
-		col = preview_col + preview_width + 1, -- placed right of preview window
+		col = preview_col + preview_width + 7, -- placed right of preview window
 		style = "minimal",
 		border = "rounded",
 	})
