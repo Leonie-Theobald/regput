@@ -114,7 +114,7 @@ function regput_modul.start()
 	-- modify cursor
 	vim.wo[win_preview].cursorline = true	-- highlight active line
 	vim.api.nvim_win_set_cursor(win_preview, { 3, 0 }) -- set cursor on first real reg line
-	vim.api.nvim_create_autocmd("Cursorregput_moduloved", {
+	vim.api.nvim_create_autocmd("CursorMoved", {
 		buffer = buf_preview,
 		callback = function()
 			local cursor_position = vim.api.nvim_win_get_cursor(win_preview)
