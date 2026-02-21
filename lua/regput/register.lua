@@ -4,11 +4,11 @@ function register.get_register_content_at_cursor_position(win_preview, register_
 	local cursor_position = vim.api.nvim_win_get_cursor(win_preview)
 	local relevant_register = register_lines[cursor_position[1]]
 	local relevant_register_name = string.sub(
-		relevant_register, 
+		relevant_register,
 		7,	-- extract register name character
 		8
 	)
-	return vim.fn.getreg(relevant_register_name, 1, true)	
+	return vim.fn.getreg(relevant_register_name, 1, true)
 end
 
 function register.get_current_content()
@@ -19,7 +19,7 @@ function register.get_current_content()
 		local new_line = string.sub(line, 1, 50)
 		if vim.fn.strchars(line) > 50 then
 			register_lines[i] = new_line .. "..."
-		else 
+		else
 			register_lines[i] = new_line
 		end
 	end

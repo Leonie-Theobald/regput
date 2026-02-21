@@ -78,7 +78,7 @@ function regput_modul.start()
 	key_bindings.add(win_preview, win_detail, win_original, buf_preview, register_lines, cursor_original)
 end
 
-function regput_modul.setup(opts)
+function regput_modul.setup()
 	vim.api.nvim_create_user_command("StartRegput", regput_modul.start, {})
 	vim.api.nvim_create_user_command("TestRegput", function()
 		print("Regput executed")

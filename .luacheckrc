@@ -1,0 +1,4 @@
+-- run `luacheck .`
+globals = {
+	"vim"
+}

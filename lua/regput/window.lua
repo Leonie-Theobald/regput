@@ -10,14 +10,14 @@ function window.close_register_window(win_preview, win_detail, win_original, cur
 	vim.api.nvim_win_set_cursor(win_original, cursor_original)
 end
 
-function window.put_content_to_window(content, window, cursor_position, p_or_P)
-	vim.api.nvim_set_current_win(window)
-	vim.api.nvim_win_set_cursor(window, cursor_position)
+function window.put_content_to_window(content, target_window, cursor_position, p_or_P)
+	vim.api.nvim_set_current_win(target_window)
+	vim.api.nvim_win_set_cursor(target_window, cursor_position)
 	if p_or_P == "p" then
 		vim.api.nvim_put(content, "l", true, true)
 	elseif p_or_P == "P" then
 		vim.api.nvim_put(content, "l", false, true)
-	else 
+	else
 		error("Select p or P")
 	end
 end
